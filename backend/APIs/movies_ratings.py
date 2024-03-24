@@ -131,7 +131,7 @@ async def fetch_movie_poster_and_overview(title: str, df: pd.DataFrame) -> dict:
         first_result = search_data['results'][0]
         poster_path = first_result.get('poster_path')
         poster_url = f'https://image.tmdb.org/t/p/original{poster_path}' if poster_path else None
-        overview = first_result.get('overview', None)
+        overview = first_result.get('overview', None)git 
         # print(poster_url)
 
         
