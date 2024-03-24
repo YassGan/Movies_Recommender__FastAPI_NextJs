@@ -1,0 +1,44 @@
+/* styles.css */
+.loader {
+    border: 8 solid rgba(0, 0, 0, 0.1); /* Light grey border, make thicker */
+    border-top: 8x solid #3498db; /* Blue border, make thicker */
+    border-radius: 50%;
+    width: 180px; /* Control size here */
+    height: 180px; /* Control size here */
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+
+
+  /* MoviesContainerStyle.css */
+.movie-element {
+    position: relative;
+    /* Your existing styles */
+  }
+  
+  .movie-element .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  .movie-element:hover .close-btn {
+    opacity: 1;
+  }
+  
