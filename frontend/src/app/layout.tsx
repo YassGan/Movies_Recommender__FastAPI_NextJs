@@ -14,6 +14,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  
   return (
     <html lang="en">
       <head>
@@ -21,16 +22,16 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} bg-[#000000] text-white`}>
         {/* Navbar */}
-        <nav className="bg-[#000000]">
+        <nav className="bg-[#000000] fixed top-0 left-0 w-full z-50 ">
           <div className="container mx-auto px-40 py-4 flex justify-between items-center">
           
           <div className="flex justify-between items-center py-2">
             <img className="w-9 h-9 rounded-full" src="/IaLogo.png" alt="Logo" />
             <a href="#" className="text-l pl-5 ">You Film</a>
             </div>
-            <div className="flex items-center px-10">
+            {/* <div className="flex items-center px-10">
               <a href="#" className="text-gray-400 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Recommend</a>
-            </div>
+            </div> */}
           </div>
         </nav>
         {/* Here is where your page content will go */}
