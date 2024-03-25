@@ -131,7 +131,7 @@ async def fetch_movie_poster_and_overview(title: str, df: pd.DataFrame) -> dict:
         first_result = search_data['results'][0]
         poster_path = first_result.get('poster_path')
         poster_url = f'https://image.tmdb.org/t/p/original{poster_path}' if poster_path else None
-        overview = first_result.get('overview', None)git 
+        overview = first_result.get('overview', None)
         # print(poster_url)
 
         
@@ -321,11 +321,11 @@ ratingsDf = pd.read_csv(CSV_FILE_PATH_ratings)
 import numpy as np
 from scipy.linalg import svd
 
-print("moviesDf Df ")
-print(moviesDf.head())
+# print("moviesDf Df ")
+# print(moviesDf.head())
 
-print("Ratings Df ")
-print(ratingsDf.head())
+# print("Ratings Df ")
+# print(ratingsDf.head())
 
 
 
@@ -386,5 +386,182 @@ def ratingProcess_firstApproach(ratingsDf):
     dfPredicted.to_csv('dataset/matrice_prédiction.csv', index=False)
     rating_matrix_pivoted.to_csv('dataset/ratingsPivoted.csv', index=False)
 
+    return dfPredicted
+
 
 # ratingProcess_firstApproach(ratingsDf)
+    
+
+
+
+ratedMoviesList=[
+    {
+        "title": "Grumpier Old Men",
+        "rating": 3
+    },
+    {
+        "title": "Tom and Huck",
+        "rating": 4
+    },
+    {
+        "title": "Sabrina",
+        "rating": 4
+    }
+]
+
+
+def Matrix_after_newRatingAdded_to_evaluate(ratedMoviesList):
+  
+  ### Les nouvelles données sont ajoutées à la fin de la matrice 
+    ratingsDf = pd.read_csv(CSV_FILE_PATH_ratings)
+    moviesDf = pd.read_csv(CSV_FILE_PATH)
+
+
+    # print("-- Movies with id dataframe")
+    # print(moviesDf)
+
+    initialRatingsDf=ratingsDf
+    # print("---- Initial ratings df ")
+    # print(initialRatingsDf.head())
+
+        # Pivot the DataFrame to get the user-item rating matrix
+    rating_matrix_pivoted = ratingsDf.pivot(index='userId', columns='movieId', values='rating')
+
+    # Handle missing values by filling with 0
+    rating_matrix_pivoted = rating_matrix_pivoted.fillna(0)
+
+
+    # print("-- rating matrix pivoted Df ")
+    # print(rating_matrix_pivoted.head())
+
+
+        # Convert the list of rated movies to a DataFrame
+    rated_movies_df = pd.DataFrame(ratedMoviesList)
+
+    # To match the titles correctly, let's strip out the year from the `movies_df` titles
+    moviesDf['clean_title'] = moviesDf['title'].str.replace(r" \(\d+\)", "", regex=True)
+
+    # Merge the two DataFrames on the cleaned title
+    merged_df = pd.merge(rated_movies_df, moviesDf, left_on='title', right_on='clean_title', how='inner')
+
+    # Select the relevant columns and convert to a list of dictionaries
+    combined_info_list = merged_df[['title_x', 'rating', 'movieId', 'genres']].to_dict('records')
+    # print("-- The combined list")
+    # print(combined_info_list)
+
+    # print("The combined list in a shape of a dataframe ")
+    # print(merged_df)
+
+    # Utilisation de .shape pour obtenir le nombre de colonnes
+    nb_lignes, nb_colonnes = rating_matrix_pivoted.shape
+
+    # print("--- Nombre colonnes de la matrice d'évaluations ",nb_colonnes)
+    # print("--- Nombre nb_lignes de la matrice d'évaluations ",nb_lignes)
+
+    newLine = [0] * nb_colonnes
+
+    for i in range(nb_colonnes):
+        found = False  # This flag will check if we found a matching movieId
+        for j in range(len(ratedMoviesList)):
+            # Check if the current column matches any movieId in combined_info_list
+            if (i+1 == combined_info_list[j]['movieId']):
+                newLine[i] = combined_info_list[j]['rating']  # Assign the rating, not the movieId
+                found = True  # Update the flag since we found a match
+                break  # Exit the inner loop once a match is found
+        if not found:
+            # If no matching movieId was found, ensure this index is set to 0
+            # This line could actually be omitted, as the list is already initialized with zeros
+            newLine[i] = 0
+
+    # print("New line:")
+    # print(newLine)
+
+    newLineDf_row = pd.DataFrame([newLine], columns=rating_matrix_pivoted.columns)
+
+    # Détermine le nouvel userId
+    new_userId = rating_matrix_pivoted.index.max() + 1
+
+    # Ajoute la nouvelle ligne au DataFrame rating_matrix_pivoted
+    # Utilise loc pour ajouter la nouvelle ligne avec le nouvel index
+    rating_matrix_pivoted.loc[new_userId] = newLineDf_row.iloc[0]
+
+    nb_lignes, nb_colonnes = rating_matrix_pivoted.shape
+
+    # print("Après l'ajout du nouvel utilisateur :")
+    # print("--- Nombre de colonnes de la matrice d'évaluations :", nb_colonnes)
+    # print("--- Nombre de lignes de la matrice d'évaluations :", nb_lignes)
+
+    movies_ids_ratings_to_return(rating_matrix_pivoted)   
+
+    return rating_matrix_pivoted 
+
+
+
+
+
+
+
+def movies_ids_ratings_to_return(matrixDf):
+    derniere_ligne = matrixDf.iloc[-1]
+    # print("-- derniere ligne ")
+    # print(derniere_ligne)
+
+    s_triee = derniere_ligne.sort_values(ascending=False)
+
+    # print("Series triée en ordre décroissant :")
+    # print(s_triee)
+
+    ids_tries = s_triee.index
+
+    # print("IDs des éléments triés :")
+    # print(ids_tries.tolist())
+
+
+    df = derniere_ligne.reset_index()
+    df.columns = ['movieId', 'rating']
+
+    # Étape 2: Trier le DataFrame par rating en ordre décroissant
+    df_sorted = df.sort_values(by='rating', ascending=False)
+
+    # Étape 3: Convertir le DataFrame trié en une liste d'objets
+    liste_objets_tries = df_sorted.to_dict('records')
+
+    # print("Liste d'objets triée par rating, avec movieId et rating :")
+    # print(liste_objets_tries[:4])
+    return liste_objets_tries
+
+
+
+def recommended_movies_to_return_fromDB(movies_numb,ids_ratings_list):
+    print("--- def recommended_movies_to_return_fromDB(movies_numb,ids_ratings_list):")
+
+
+    if len(ids_ratings_list)>movies_numb:
+        ids_ratings_list=ids_ratings_list[:movies_numb]
+    
+
+    recommended_movies=[]
+    for item in ids_ratings_list:
+        movie_id = item['movieId']
+        print("Movie id ",movie_id)
+        
+        movie_document = moviesCollection.find_one({'movie_id': movie_id})
+
+        if movie_document:
+        # Assuming the movie document has a 'title' field
+            recommended_movies.append(movie_document)
+            
+            # Stop if we have collected the desired number of movies
+            if len(recommended_movies) >= movies_numb:
+                break
+    return recommended_movies
+
+  
+
+
+
+df=Matrix_after_newRatingAdded_to_evaluate(ratedMoviesList)    
+
+print("recommended movies")
+print(recommended_movies_to_return_fromDB(5,movies_ids_ratings_to_return(df)))
+
