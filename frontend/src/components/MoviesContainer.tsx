@@ -6,26 +6,29 @@ import  "./MoviesContainerStyle.css"
 import axios from 'axios'; // Make sure to install axios or use fetch API
 
 
+import Link from 'next/link'
+
+
 const MoviesContainer = () => {
   const [yearFilter, setYearFilter] = useState(new Date().getFullYear());
   const [movieRatings, setMovieRatings] = useState([]);
   const [activeButton, setActiveButton] = useState('grid');
   const [moviesData, setMoviesData] = useState([]); // State to hold fetched movies
-  const [isLoading, setIsLoading] = useState(false); // Loading state
+  const [isLoading, setIsLoading] = useState(true); // Loading state
 
   
   const [isPopupVisible, setIsPopupVisible] = useState(false);
 
 
   const [page, setPage] = useState(1); // Page state for pagination
-  const x = 30; // Number of movies to fetch each time
+  const x = 10; // Number of movies to fetch each time
 
   useEffect(() => {
     fetchMovies(x, page);
   }, [page]);
 
   const fetchMovies = async (x, page) => {
-    setIsLoading(true); // Start loading
+    setIsLoading(true);
 
     try {
       
@@ -91,7 +94,8 @@ const MoviesContainer = () => {
 
   const recommendClicked = () => {
     console.log("Rated Movies:", movieRatings);
-    alert(movieRatings)
+    // alert(movieRatings)
+    localStorage.setItem('RateMoviesByClient', JSON.stringify(movieRatings));
 
   };
 
@@ -105,11 +109,14 @@ const MoviesContainer = () => {
 {isLoading ? (
         <div style={{ marginBottom: '400px' }}  className="flex justify-center items-center ">
   
-  <h2>Loading ...</h2>
+  <h2>Loading Movies ...</h2>
   
     <div className="loader">   </div> {/* Loading spinner appears only when isLoading is true */}
         </div>
       ) : activeButton === 'grid' && (
+      
+        <Link href="/ReturnedMovies">
+
         <div 
 
         onMouseEnter={() => setIsPopupVisible(true)}
@@ -118,6 +125,7 @@ const MoviesContainer = () => {
         onClick={recommendClicked} className="text-gray-400 hover:text-white px-3 py-2 cursor-pointer text-sm font-medium fixed top-0 right-0 m-4 p-2 rounded-lg z-50 mr-40">
           <h1>Recommended {movieRatings.length}</h1>
         </div>
+        </Link>
       )}
 
 {isPopupVisible && (

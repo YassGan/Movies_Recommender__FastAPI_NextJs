@@ -20,14 +20,15 @@ export default function RootLayout({
       <head>
         {/* You should also include your <head> content here */}
       </head>
-      <body className={`${inter.className} bg-[#000000] text-white`}>
+      <body className=
+      {`${inter.className} bg-[#000000] text-white`}>
         {/* Navbar */}
         <nav className="bg-[#000000] fixed top-0 left-0 w-full z-50 ">
           <div className="container mx-auto px-40 py-4 flex justify-between items-center">
           
           <div className="flex justify-between items-center py-2">
             <img className="w-9 h-9 rounded-full" src="/IaLogo.png" alt="Logo" />
-            <a href="#" className="text-l pl-5 ">You Film</a>
+            <a href="/" className="text-l pl-5 ">You Film</a>
             </div>
             {/* <div className="flex items-center px-10">
               <a href="#" className="text-gray-400 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Recommend</a>
@@ -36,6 +37,29 @@ export default function RootLayout({
         </nav>
         {/* Here is where your page content will go */}
         {children}
+
+
+
+        <footer className="bg-black text-white p-4 pb-10">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="flex justify-between items-center">
+      <div className="flex items-center">
+        <img src="/IaLogo.png" className="h-8 w-auto" alt="Your Logo" />
+        <p className="text-sm ml-4">&copy; {new Date().getFullYear()} You Film, Inc. All rights reserved.</p>
+      </div>
+
+
+        <p className="text-sm ml-4">&copy; yassinegana.gana@gmail.com</p>
+
+
+
+      <div className="flex items-center">
+        <a  className="text-sm text-gray-300 hover:text-gray-500 ml-6">Terms of Service</a>
+        <a className="text-sm text-gray-300 hover:text-gray-500 ml-6">Privacy Policy</a>
+      </div>
+    </div>
+  </div>
+</footer>
       </body>
     </html>
   );

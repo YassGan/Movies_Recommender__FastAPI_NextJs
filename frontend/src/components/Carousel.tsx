@@ -2,7 +2,16 @@ import React, { useState, useEffect } from 'react';
 import './Carousel.css';
 import MovieElement from './MovieElement';
 
+import Link from 'next/link'
+
+
+
 const Carousel = ({ slides }) => {
+
+
+
+
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [movieRatings, setMovieRatings] = useState([]);
   const [slidesArray, setSlidesArray] = useState([]);
@@ -43,9 +52,41 @@ const Carousel = ({ slides }) => {
     setSlidesArray(updatedSlides); // Update slidesArray to reflect the removal
   };
 
-  const recommendClicked = () => {
+  const recommendClicked = async () => {
     console.log("Rated Movies:", movieRatings);
-    alert(movieRatings);
+    // alert(movieRatings);
+
+
+
+
+
+    localStorage.setItem('RateMoviesByClient', JSON.stringify(movieRatings));
+
+
+    // const response = await fetch('http://127.0.0.1:8000/movies_recommendation_dynamic', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify(movieRatings),
+    // });
+
+    // if (response.ok) {
+    //   const recommendedMovies = await response.json();
+    //   console.log("recommendedMovies")
+    //   console.log(recommendedMovies)
+
+
+    //   console.log("response")
+    //   console.log(response)
+    // }
+
+
+
+
+
+
+
   };
 
   const goToPrevious = () => {
@@ -73,12 +114,15 @@ const Carousel = ({ slides }) => {
   return (
     <div
       className="carousel-container flex justify-center items-center mb-5">
+     
+     <Link href="/ReturnedMovies">
+
       <div onMouseEnter={() => setIsPopupVisible(true)}
         onMouseLeave={() => setIsPopupVisible(false)} onClick={recommendClicked} className="text-gray-400 hover:text-white px-3 py-2 cursor-pointer text-sm font-medium fixed top-0 right-0 m-4 p-2 rounded-lg z-50 mr-40">
         <h1   >Recommended {movieRatings.length}</h1>
       </div>
 
-
+      </Link>
 
       <div className="carousel-wrapper flex justify-between items-center w-full">
         <button onClick={goToPrevious} className="left-arrow bg-white text-black border-none rounded-full w-10 h-10 flex items-center justify-center cursor-pointer shadow-md hover:bg-gray-200 transition-colors duration-300 mx-2">

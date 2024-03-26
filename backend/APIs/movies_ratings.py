@@ -209,9 +209,9 @@ async def Insert_FOREX_Quotes_Creation_API():
     finalTab=[]
     
 
-    ###for i in range(0,len(titles_list) , batch_size):
+    for i in range(0,len(titles_list) , batch_size):
 
-    for i in range(0,150 , batch_size):
+    # for i in range(0,150 , batch_size):
         symbols_batch = titles_list[i:i + batch_size]
         awaitable_tasks = [fetch_movie_poster_and_overview(title,df) for title in symbols_batch]
         batch_results = await asyncio.gather(*awaitable_tasks)
@@ -219,7 +219,6 @@ async def Insert_FOREX_Quotes_Creation_API():
         print("---------  await asyncio.gather(*awaitable_tasks) ")
         # print(batch_results)
         finalTab.append(batch_results)
-    # Flatten the nested list into a single list using list comprehension
     movies_flat_final = [movie for sublist in finalTab for movie in sublist]
     print(movies_flat_final)
     serL=serializeList2(movies_flat_final)
@@ -230,13 +229,6 @@ async def Insert_FOREX_Quotes_Creation_API():
         toInsertArray= serL[i:i + chunk_size]
         moviesCollection.insert_many(toInsertArray)
     return {"message": finalTab}
-
-
-
-
-
-
-
 
 
 
@@ -336,8 +328,7 @@ def ratingProcess_firstApproach(ratingsDf):
             random_value = np.random.uniform(1, 5)
             return round(random_value)
         else:
-            return x  # or any other operation for non-zero values
-# Apply the function across the entire DataFrame
+            return x  
 
 
 
@@ -394,20 +385,20 @@ def ratingProcess_firstApproach(ratingsDf):
 
 
 
-ratedMoviesList=[
-    {
-        "title": "Grumpier Old Men",
-        "rating": 3
-    },
-    {
-        "title": "Tom and Huck",
-        "rating": 4
-    },
-    {
-        "title": "Sabrina",
-        "rating": 4
-    }
-]
+# ratedMoviesList=[
+#     {
+#         "title": "Grumpier Old Men",
+#         "rating": 3
+#     },
+#     {
+#         "title": "Tom and Huck",
+#         "rating": 4
+#     },
+#     {
+#         "title": "Sabrina",
+#         "rating": 4
+#     }
+# ]
 
 
 def Matrix_after_newRatingAdded_to_evaluate(ratedMoviesList):
@@ -435,16 +426,12 @@ def Matrix_after_newRatingAdded_to_evaluate(ratedMoviesList):
     # print(rating_matrix_pivoted.head())
 
 
-        # Convert the list of rated movies to a DataFrame
     rated_movies_df = pd.DataFrame(ratedMoviesList)
 
-    # To match the titles correctly, let's strip out the year from the `movies_df` titles
     moviesDf['clean_title'] = moviesDf['title'].str.replace(r" \(\d+\)", "", regex=True)
 
-    # Merge the two DataFrames on the cleaned title
     merged_df = pd.merge(rated_movies_df, moviesDf, left_on='title', right_on='clean_title', how='inner')
 
-    # Select the relevant columns and convert to a list of dictionaries
     combined_info_list = merged_df[['title_x', 'rating', 'movieId', 'genres']].to_dict('records')
     # print("-- The combined list")
     # print(combined_info_list)
@@ -461,16 +448,14 @@ def Matrix_after_newRatingAdded_to_evaluate(ratedMoviesList):
     newLine = [0] * nb_colonnes
 
     for i in range(nb_colonnes):
-        found = False  # This flag will check if we found a matching movieId
+        found = False 
         for j in range(len(ratedMoviesList)):
-            # Check if the current column matches any movieId in combined_info_list
             if (i+1 == combined_info_list[j]['movieId']):
-                newLine[i] = combined_info_list[j]['rating']  # Assign the rating, not the movieId
-                found = True  # Update the flag since we found a match
-                break  # Exit the inner loop once a match is found
+                newLine[i] = combined_info_list[j]['rating']  
+                found = True  
+                break  
         if not found:
-            # If no matching movieId was found, ensure this index is set to 0
-            # This line could actually be omitted, as the list is already initialized with zeros
+
             newLine[i] = 0
 
     # print("New line:")
@@ -497,10 +482,6 @@ def Matrix_after_newRatingAdded_to_evaluate(ratedMoviesList):
 
 
 
-
-
-
-
 def movies_ids_ratings_to_return(matrixDf):
     derniere_ligne = matrixDf.iloc[-1]
     # print("-- derniere ligne ")
@@ -520,10 +501,8 @@ def movies_ids_ratings_to_return(matrixDf):
     df = derniere_ligne.reset_index()
     df.columns = ['movieId', 'rating']
 
-    # Étape 2: Trier le DataFrame par rating en ordre décroissant
     df_sorted = df.sort_values(by='rating', ascending=False)
 
-    # Étape 3: Convertir le DataFrame trié en une liste d'objets
     liste_objets_tries = df_sorted.to_dict('records')
 
     # print("Liste d'objets triée par rating, avec movieId et rating :")
@@ -560,8 +539,87 @@ def recommended_movies_to_return_fromDB(movies_numb,ids_ratings_list):
 
 
 
-df=Matrix_after_newRatingAdded_to_evaluate(ratedMoviesList)    
+# df=Matrix_after_newRatingAdded_to_evaluate(ratedMoviesList)    
 
-print("recommended movies")
-print(recommended_movies_to_return_fromDB(5,movies_ids_ratings_to_return(df)))
+# print("recommended movies")
+# print(recommended_movies_to_return_fromDB(5,movies_ids_ratings_to_return(df)))
 
+
+
+@Movies_Ratings.get("/movies_recommendation")
+async def movies_recommendation_Function_Api():
+
+
+
+    ratedMoviesList=[
+        {
+            "title": "Grumpier Old Men",
+            "rating": 3
+        },
+        {
+            "title": "Tom and Huck",
+            "rating": 4
+        },
+        {
+            "title": "Sabrina",
+            "rating": 4
+        }
+    ]
+
+
+
+    df=Matrix_after_newRatingAdded_to_evaluate(ratedMoviesList)    
+    suggestedMovies=recommended_movies_to_return_fromDB(5,movies_ids_ratings_to_return(df))
+    return serializeList2(suggestedMovies)
+
+
+
+from pydantic import BaseModel
+from typing import List
+
+class MovieRating(BaseModel):
+    title: str
+    rating: int
+
+
+
+def modify_ratings(dataframe):
+    """Randomly changes the rating values for each movie."""
+    # We assume ratings are between 1.0 and 5.0
+    dataframe['rating'] = np.random.uniform(low=1.0, high=5.0, size=len(dataframe))
+    return dataframe
+
+
+
+@Movies_Ratings.post("/movies_recommendation_dynamic")
+async def movies_recommendation_function_api(rated_movies_list: List[MovieRating]):
+    rated_movies_list_dicts = [movie_rating.dict() for movie_rating in rated_movies_list]
+
+    print("--- The rated chosen movies")
+    print(rated_movies_list_dicts)
+    print("")
+
+
+    df = Matrix_after_newRatingAdded_to_evaluate(rated_movies_list_dicts)  
+  
+
+
+
+    dfmod=modify_ratings(ratingsDf)
+
+
+    df2=ratingProcess_firstApproach(dfmod)
+
+
+
+
+    # print("    print(df.columns)")
+    # print(df.columns)
+
+    # print("    print(df2)")
+    # print(df2)
+
+
+
+    suggested_movies = recommended_movies_to_return_fromDB(10, movies_ids_ratings_to_return(df2))
+    return serializeList2(suggested_movies)

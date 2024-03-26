@@ -1,17 +1,33 @@
-/* styles.css */
+/* Enhanced styles.css */
 .loader {
-    border: 8 solid rgba(0, 0, 0, 0.1); /* Light grey border, make thicker */
-    border-top: 8x solid #3498db; /* Blue border, make thicker */
-    border-radius: 50%;
-    width: 180px; /* Control size here */
-    height: 180px; /* Control size here */
-  }
-  
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  
+  border: 10px solid rgba(0, 0, 0, 0.1); 
+  border-top: 10px solid #3498db;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 2s linear infinite; 
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Applying ease-in-out for a smoother start and end */
+.loader {
+  animation-timing-function: ease-in-out;
+}
+
+/* Optional: Gradient border for a more dynamic look */
+.loader {
+  border-top: 10px solid transparent; /* Make the top border transparent */
+  background-image: linear-gradient(white, white), 
+                    conic-gradient(#3498db, #9b59b6, #3498db); /* Gradient from blue to purple and back */
+  background-origin: border-box; /* Align the gradient with the border */
+  background-clip: content-box, border-box; /* Clip the background to the loader's content and border */
+}
+
 
 
   /* MoviesContainerStyle.css */
