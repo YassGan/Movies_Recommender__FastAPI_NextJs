@@ -1,6 +1,5 @@
 # Movies_Recommender__FastAPI_NextJs
 
-# Movies Recommender Project Documentation
 
 **Subject:** Programming Paradigms  
 **Teacher:** Mrs. Lassoued Imen  
