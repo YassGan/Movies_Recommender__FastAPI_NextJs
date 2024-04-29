@@ -86,3 +86,5 @@ The last function is the `movieIdsRatingsToReturn` function. In this function, w
 ## 7. Conclusion
 
 This movie recommendation system project based on the Singular Value Decomposition (SVD) algorithm implemented a complete application combining aspects of machine learning, backend development with Python/FastAPI, and frontend development with React/Next.js.
+
+For a better understanding, you may read this documentation with figures: https://drive.google.com/file/d/1hgZPTKOVXIS-eTN7XV5EI0-zPtG75syL/view?usp=sharing
